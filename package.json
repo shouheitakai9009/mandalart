@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "bunx prisma generate & next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
@@ -50,6 +50,7 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "zod": "^4.3.4"
   }
 }

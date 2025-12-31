@@ -18,3 +18,7 @@
 ## 要件定義
 
 ユーザが希望するアプリケーションの要件定義を知りたい時は、[requirements_definition.md](docs/requirements_definition.md) を参照してください。
+
+## API ドキュメント
+
+API ドキュメントを知りたい時は、[api_documentation.md](docs/api_documentation.md) を参照してください。
