@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ユーザー
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  name       String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  mandalarts Mandalart[]
+
+  @@index([email])
+}
+
+// マンダラート（大目標を持つ）
+model Mandalart {
+  id         String              @id @default(cuid())
+  mainGoal   String              // 大目標（中心のセル）
+  status     MandalartStatus     @default(ACTIVE)
+  userId     String
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goals      Goal[]
+  snapshots  MandalartSnapshot[]
+  startDate  DateTime            @default(now()) // 開始日（通常は月曜日）
+  endDate    DateTime?           // 終了日（完了時に設定）
+  deletedAt  DateTime?           // ソフトデリート用
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, deletedAt])
+}
+
+// マンダラートスナップショット（週次保存）
+model MandalartSnapshot {
+  id            String    @id @default(cuid())
+  mandalartId   String
+  mandalart     Mandalart @relation(fields: [mandalartId], references: [id], onDelete: Cascade)
+  mainGoal      String    // スナップショット時点の大目標
+  snapshotData  Json      // スナップショット時点の全データ（goals + tasks）をJSON形式で保存
+  weekStartDate DateTime  // その週の開始日（月曜日）
+  weekEndDate   DateTime  // その週の終了日（日曜日）
+  createdAt     DateTime  @default(now())
+
+  @@index([mandalartId, weekStartDate])
+  @@index([mandalartId, createdAt])
+}
+
+// 目標（8つ）
+model Goal {
+  id          String     @id @default(cuid())
+  title       String     // 目標のタイトル
+  position    Int        // 位置（1-8）中心の周りの8つのセル
+  mandalartId String
+  mandalart   Mandalart  @relation(fields: [mandalartId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([mandalartId, position])
+  @@index([mandalartId])
+}
+
+// タスク（各目標に8つ）
+model Task {
+  id           String   @id @default(cuid())
+  title        String   // タスクのタイトル（例: "ジムに行く"）
+  currentCount Int      @default(0) // 現在の実行回数（例: 1）
+  targetCount  Int      // 目標回数（例: 7）
+  targetUnit   String   // 目標単位（例: "回", "日", "時間"など自由入力）
+  position     Int      // 目標内での位置（1-8）
+  goalId       String
+  goal         Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([goalId, position])
+  @@index([goalId])
+}
+
+// マンダラートのステータス
+enum MandalartStatus {
+  ACTIVE    // アクティブ（進行中）
+  COMPLETED // 完了
+  DELETED   // 削除済み（ソフトデリート）
+}
