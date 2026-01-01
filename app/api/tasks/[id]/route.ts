@@ -5,11 +5,12 @@ import { updateTaskSchema } from '../../mandalarts/schemas';
 // GET /api/tasks/[id] - 特定のタスクを取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const task = await prisma.task.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         goal: {
           include: {
@@ -36,9 +37,10 @@ export async function GET(
 // PUT /api/tasks/[id] - タスクを更新
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     // zodでバリデーション
@@ -56,7 +58,7 @@ export async function PUT(
 
     // タスクの存在確認とマンダラートのステータス確認
     const existingTask = await prisma.task.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         goal: {
           include: {
@@ -82,7 +84,7 @@ export async function PUT(
     }
 
     const task = await prisma.task.update({
-      where: { id: params.id },
+      where: { id },
       data: result.data,
     });
 
@@ -99,11 +101,12 @@ export async function PUT(
 // DELETE /api/tasks/[id] - タスクを削除（通常は使用しない）
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const existingTask = await prisma.task.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         goal: {
           include: {
@@ -128,7 +131,7 @@ export async function DELETE(
     }
 
     await prisma.task.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({

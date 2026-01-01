@@ -5,11 +5,12 @@ import { updateGoalSchema } from '../../mandalarts/schemas';
 // GET /api/goals/[id] - 特定の目標を取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const goal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         tasks: {
           orderBy: {
@@ -37,9 +38,10 @@ export async function GET(
 // PUT /api/goals/[id] - 目標を更新
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     // zodでバリデーション
@@ -57,7 +59,7 @@ export async function PUT(
 
     // 目標の存在確認とマンダラートのステータス確認
     const existingGoal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         mandalart: true,
       },
@@ -79,7 +81,7 @@ export async function PUT(
     }
 
     const goal = await prisma.goal.update({
-      where: { id: params.id },
+      where: { id },
       data: result.data,
       include: {
         tasks: {
@@ -103,12 +105,13 @@ export async function PUT(
 // DELETE /api/goals/[id] - 目標を削除（通常は使用しない）
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // 目標の削除は通常推奨されないが、実装は提供
     const existingGoal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         mandalart: true,
       },
@@ -129,7 +132,7 @@ export async function DELETE(
     }
 
     await prisma.goal.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({

@@ -1,17 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import { appSlice } from './slice';
+import { mandalartSlice } from './slice';
 
 // Selector
-export const useAppSelector = () => useSelector((state: RootState) => state.app);
+export const useMandalartSelector = () =>
+  useSelector((state: RootState) => state.mandalart);
 
 // Actions
-export const useActions = () => {
+export const useMandalartActions = () => {
   const dispatch = useDispatch();
-  return bindActionCreators(appSlice.actions, dispatch);
+  return bindActionCreators(mandalartSlice.actions, dispatch);
 };
 
 // 型のエクスポート
-export type { AppState, Cell } from './state';
+export type { MandalartState } from './state';
+export type { Mandalart, Goal, Task, CellType, EditingCell } from './mandalart';
 export type { RootState, AppStore, AppDispatch } from './store';

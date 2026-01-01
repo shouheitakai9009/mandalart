@@ -4,12 +4,13 @@ import { prisma } from '@/libs/prisma';
 // GET /api/mandalarts/[id]/snapshots - マンダラートのスナップショット一覧を取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const snapshots = await prisma.mandalartSnapshot.findMany({
       where: {
-        mandalartId: params.id,
+        mandalartId: id,
       },
       orderBy: {
         weekStartDate: 'desc',
@@ -29,12 +30,13 @@ export async function GET(
 // POST /api/mandalarts/[id]/snapshots - 新しいスナップショットを作成
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // マンダラートの存在確認
     const mandalart = await prisma.mandalart.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         goals: {
           include: {
@@ -71,7 +73,7 @@ export async function POST(
     // 同じ週のスナップショットが既に存在するかチェック
     const existingSnapshot = await prisma.mandalartSnapshot.findFirst({
       where: {
-        mandalartId: params.id,
+        mandalartId: id,
         weekStartDate: {
           gte: weekStartDate,
           lte: weekEndDate,
@@ -106,7 +108,7 @@ export async function POST(
     // スナップショットを作成
     const snapshot = await prisma.mandalartSnapshot.create({
       data: {
-        mandalartId: params.id,
+        mandalartId: id,
         mainGoal: mandalart.mainGoal,
         snapshotData,
         weekStartDate,

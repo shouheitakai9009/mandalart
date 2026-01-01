@@ -5,12 +5,13 @@ import { updateMandalartSchema } from '../schemas';
 // GET /api/mandalarts/[id] - 特定のマンダラートを取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const mandalart = await prisma.mandalart.findUnique({
       where: {
-        id: params.id,
+        id,
       },
       include: {
         goals: {
@@ -57,9 +58,10 @@ export async function GET(
 // PUT /api/mandalarts/[id] - マンダラートを更新
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     // zodでバリデーション
@@ -79,7 +81,7 @@ export async function PUT(
 
     // マンダラートの存在確認
     const existingMandalart = await prisma.mandalart.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingMandalart) {
@@ -105,7 +107,7 @@ export async function PUT(
     }
 
     const mandalart = await prisma.mandalart.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         goals: {
@@ -132,14 +134,15 @@ export async function PUT(
 // DELETE /api/mandalarts/[id] - マンダラートをソフトデリート
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const hard = searchParams.get('hard') === 'true';
 
     const existingMandalart = await prisma.mandalart.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingMandalart) {
@@ -152,7 +155,7 @@ export async function DELETE(
     if (hard) {
       // ハードデリート（物理削除）
       await prisma.mandalart.delete({
-        where: { id: params.id },
+        where: { id },
       });
 
       return NextResponse.json({
@@ -162,7 +165,7 @@ export async function DELETE(
     } else {
       // ソフトデリート（論理削除）
       const mandalart = await prisma.mandalart.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           deletedAt: new Date(),
           status: 'DELETED',

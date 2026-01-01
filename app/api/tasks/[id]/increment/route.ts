@@ -4,11 +4,12 @@ import { prisma } from '@/libs/prisma';
 // POST /api/tasks/[id]/increment - タスクの実行回数をインクリメント
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const existingTask = await prisma.task.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         goal: {
           include: {
@@ -42,7 +43,7 @@ export async function POST(
     }
 
     const task = await prisma.task.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         currentCount: {
           increment: 1,

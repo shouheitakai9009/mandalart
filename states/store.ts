@@ -1,14 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import appReducer from './slice';
+import mandalartReducer from './slice';
 
-export const store = () => {
+export const makeStore = () => {
   return configureStore({
     reducer: {
-      app: appReducer,
+      mandalart: mandalartReducer,
     },
   });
 };
 
-export type AppStore = ReturnType<typeof store>;
+export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore['getState']>;
 export type AppDispatch = AppStore['dispatch'];

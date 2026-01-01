@@ -4,11 +4,12 @@ import { prisma } from '@/libs/prisma';
 // POST /api/mandalarts/[id]/complete - マンダラートを完了する
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const existingMandalart = await prisma.mandalart.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingMandalart) {
@@ -33,7 +34,7 @@ export async function POST(
     }
 
     const mandalart = await prisma.mandalart.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: 'COMPLETED',
         endDate: new Date(),

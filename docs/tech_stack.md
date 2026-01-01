@@ -38,9 +38,11 @@
 
 ### データベース
 
-- **Vercel Postgres**: サーバーレス PostgreSQL データベース
-  - Vercel プラットフォームとシームレスに統合
-  - 自動スケーリング
+- **Supabase**: オープンソースの Firebase 代替
+  - PostgreSQL データベース（AWS 上でホスティング）
+  - リアルタイム機能
+  - 認証・認可機能（将来的に使用予定）
+  - Row Level Security (RLS) サポート
 
 ### ORM
 
@@ -48,6 +50,14 @@
   - スキーマファーストの開発
   - 自動生成される TypeScript 型
   - マイグレーション管理機能
+  - `@prisma/adapter-pg` によるコネクションプーリング対応
+
+### バリデーション
+
+- **Zod**: TypeScript ファーストのスキーマバリデーションライブラリ
+  - API リクエストの型安全なバリデーション
+  - 自動型推論
+  - エラーメッセージのカスタマイズ
 
 ## UI/UX
 
@@ -84,4 +94,8 @@
 
 ### データベースホスティング
 
-- **Vercel Postgres**: Vercel Storage の一部として提供
+- **Supabase**: PostgreSQL データベースホスティング
+  - AWS リージョン: ap-northeast-1（東京）
+  - コネクションプーリング対応（PgBouncer）
+  - 自動バックアップ
+  - 無料プランで開発可能

@@ -4,11 +4,12 @@ import { prisma } from '@/libs/prisma';
 // GET /api/snapshots/[id] - 特定のスナップショットを取得
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const snapshot = await prisma.mandalartSnapshot.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         mandalart: true,
       },
@@ -36,9 +37,10 @@ export async function GET(
 // 緊急時のために実装を提供
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const force = searchParams.get('force') === 'true';
 
@@ -53,7 +55,7 @@ export async function DELETE(
     }
 
     const snapshot = await prisma.mandalartSnapshot.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!snapshot) {
@@ -64,7 +66,7 @@ export async function DELETE(
     }
 
     await prisma.mandalartSnapshot.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({
