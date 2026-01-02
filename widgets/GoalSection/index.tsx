@@ -3,11 +3,11 @@
 import { Grid } from '@/designs/Grid';
 import { Cell } from '@/designs/Cell';
 import { TaskCell } from '@/widgets/TaskCell';
-import { Goal } from '@/states';
+import { Goal, Task } from '@/states';
 
 export interface GoalSectionProps {
   goal: Goal;
-  onTaskIncrement?: (taskId: string) => void;
+  onTaskClick?: (task: Task) => void;
   onGoalSelect?: () => void;
   selectedTaskId?: string | null;
   goalColor?: string;
@@ -19,7 +19,7 @@ export interface GoalSectionProps {
  */
 export const GoalSection = ({
   goal,
-  onTaskIncrement,
+  onTaskClick,
   onGoalSelect,
   selectedTaskId,
   goalColor,
@@ -62,8 +62,8 @@ export const GoalSection = ({
             key={task.id}
             task={task}
             isSelected={selectedTaskId === task.id}
-            onIncrement={
-              onTaskIncrement ? () => onTaskIncrement(task.id) : undefined
+            onSelect={
+              onTaskClick ? () => onTaskClick(task) : undefined
             }
           />
         );

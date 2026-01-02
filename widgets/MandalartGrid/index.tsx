@@ -3,11 +3,12 @@
 import { Grid } from '@/designs/Grid';
 import { GoalSection } from '@/widgets/GoalSection';
 import { CenterSection } from '@/widgets/CenterSection';
-import { Mandalart } from '@/states';
+import { Mandalart, Task } from '@/states';
+import { GOAL_COLORS } from '@/libs/constants';
 
 export interface MandalartGridProps {
   mandalart: Mandalart;
-  onTaskIncrement?: (goalId: string, taskId: string) => void;
+  onTaskClick?: (task: Task) => void;
   onMainGoalClick?: () => void;
   selectedCellId?: string | null;
 }
@@ -20,7 +21,7 @@ export interface MandalartGridProps {
  */
 export const MandalartGrid = ({
   mandalart,
-  onTaskIncrement,
+  onTaskClick,
   onMainGoalClick,
   selectedCellId,
 }: MandalartGridProps) => {
@@ -28,18 +29,6 @@ export const MandalartGrid = ({
   const sortedGoals = [...mandalart.goals].sort(
     (a, b) => a.position - b.position
   );
-
-  // 各目標セルの背景色を定義（goal position 1-8に対応）- より鮮やかな色に
-  const goalColors = [
-    'bg-gradient-to-br from-blue-200 to-blue-300 text-blue-950 font-semibold',       // goal 1
-    'bg-gradient-to-br from-purple-200 to-purple-300 text-purple-950 font-semibold',   // goal 2
-    'bg-gradient-to-br from-pink-200 to-pink-300 text-pink-950 font-semibold',       // goal 3
-    'bg-gradient-to-br from-green-200 to-green-300 text-green-950 font-semibold',     // goal 4
-    'bg-gradient-to-br from-orange-200 to-orange-300 text-orange-950 font-semibold',   // goal 5
-    'bg-gradient-to-br from-teal-200 to-teal-300 text-teal-950 font-semibold',       // goal 6
-    'bg-gradient-to-br from-indigo-200 to-indigo-300 text-indigo-950 font-semibold',   // goal 7
-    'bg-gradient-to-br from-rose-200 to-rose-300 text-rose-950 font-semibold',       // goal 8
-  ];
 
   return (
     <Grid size={3} gap="md" className="w-full max-w-6xl">
@@ -54,7 +43,7 @@ export const MandalartGrid = ({
                 mainGoal={mandalart.mainGoal}
                 goals={mandalart.goals}
                 onMainGoalClick={onMainGoalClick}
-                goalColors={goalColors}
+                goalColors={GOAL_COLORS}
               />
             </div>
           );
@@ -73,17 +62,13 @@ export const MandalartGrid = ({
         }
 
         // 目標の色を取得
-        const goalColor = goalColors[goalPosition - 1];
+        const goalColor = GOAL_COLORS[goalPosition - 1];
 
         return (
           <div key={goal.id} className="w-full h-full shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-lg overflow-hidden">
             <GoalSection
               goal={goal}
-              onTaskIncrement={
-                onTaskIncrement
-                  ? (taskId) => onTaskIncrement(goal.id, taskId)
-                  : undefined
-              }
+              onTaskClick={onTaskClick}
               selectedTaskId={selectedCellId}
               goalColor={goalColor}
             />

@@ -1,6 +1,48 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { MandalartState, initialState } from './state';
 import { Mandalart, EditingCell, Task } from './mandalart';
+
+// マンダラート一覧取得
+export const fetchMandalarts = createAsyncThunk(
+  'mandalart/fetchMandalarts',
+  async (userId: string) => {
+    const response = await fetch(`/api/mandalarts?userId=${userId}`);
+    if (!response.ok) {
+      throw new Error('マンダラートの取得に失敗しました');
+    }
+    return response.json();
+  }
+);
+
+// タスク更新
+export const updateTaskAsync = createAsyncThunk(
+  'mandalart/updateTask',
+  async ({ taskId, updates }: { taskId: string; updates: Partial<Task> }) => {
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) {
+      throw new Error('タスクの更新に失敗しました');
+    }
+    return response.json();
+  }
+);
+
+// タスク削除
+export const deleteTaskAsync = createAsyncThunk(
+  'mandalart/deleteTask',
+  async ({ taskId, goalId }: { taskId: string; goalId: string }) => {
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('タスクの削除に失敗しました');
+    }
+    return { taskId, goalId };
+  }
+);
 
 export const mandalartSlice = createSlice({
   name: 'mandalart',
@@ -89,9 +131,14 @@ export const mandalartSlice = createSlice({
       state.editingCell = action.payload;
     },
 
-    // ローディング状態を設定
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
+    // マンダラート一覧のローディング状態を設定
+    setLoadingMandalarts: (state, action: PayloadAction<boolean>) => {
+      state.isLoadingMandalarts = action.payload;
+    },
+
+    // タスクのローディング状態を設定
+    setLoadingTask: (state, action: PayloadAction<boolean>) => {
+      state.isLoadingTask = action.payload;
     },
 
     // エラーを設定
@@ -101,6 +148,94 @@ export const mandalartSlice = createSlice({
 
     // 状態をリセット
     resetState: () => initialState,
+  },
+  extraReducers: (builder) => {
+    // fetchMandalarts
+    builder
+      .addCase(fetchMandalarts.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchMandalarts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.mandalarts = action.payload;
+        // 最初のアクティブなマンダラートを現在のマンダラートに設定
+        const activeMandalart = action.payload.find(
+          (m: Mandalart) => m.status === 'ACTIVE'
+        );
+        if (activeMandalart) {
+          state.currentMandalart = activeMandalart;
+        }
+      })
+      .addCase(fetchMandalarts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'マンダラートの取得に失敗しました';
+      })
+      // updateTaskAsync
+      .addCase(updateTaskAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateTaskAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Redux Storeの該当タスクを更新
+        if (state.currentMandalart) {
+          const updatedTask = action.payload;
+          const goal = state.currentMandalart.goals.find(
+            (g) => g.id === updatedTask.goalId
+          );
+          if (goal) {
+            const taskIndex = goal.tasks.findIndex(
+              (t) => t.id === updatedTask.id
+            );
+            if (taskIndex !== -1) {
+              goal.tasks[taskIndex] = updatedTask;
+            }
+          }
+        }
+        // mandalarts配列内も更新
+        if (state.currentMandalart) {
+          const mandalartIndex = state.mandalarts.findIndex(
+            (m) => m.id === state.currentMandalart?.id
+          );
+          if (mandalartIndex !== -1) {
+            state.mandalarts[mandalartIndex] = state.currentMandalart;
+          }
+        }
+      })
+      .addCase(updateTaskAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'タスクの更新に失敗しました';
+      })
+      // deleteTaskAsync
+      .addCase(deleteTaskAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteTaskAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Redux Storeから該当タスクを削除
+        if (state.currentMandalart) {
+          const { taskId, goalId } = action.payload;
+          const goal = state.currentMandalart.goals.find((g) => g.id === goalId);
+          if (goal) {
+            goal.tasks = goal.tasks.filter((t) => t.id !== taskId);
+          }
+        }
+        // mandalarts配列内も更新
+        if (state.currentMandalart) {
+          const mandalartIndex = state.mandalarts.findIndex(
+            (m) => m.id === state.currentMandalart?.id
+          );
+          if (mandalartIndex !== -1) {
+            state.mandalarts[mandalartIndex] = state.currentMandalart;
+          }
+        }
+      })
+      .addCase(deleteTaskAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'タスクの削除に失敗しました';
+      });
   },
 });
 

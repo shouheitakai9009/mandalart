@@ -24,7 +24,7 @@ export const ProgressBar = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="relative h-7 w-full overflow-hidden rounded-full bg-gray-100 shadow-inner">
+      <div className="relative h-7 w-full overflow-hidden rounded-lg bg-red-100 shadow-inner">
         <motion.div
           className={`h-full ${
             isComplete
@@ -36,12 +36,7 @@ export const ProgressBar = ({
           transition={{ duration: 0.4, ease: 'easeOut' }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span
-            className="text-[10px] font-bold text-gray-800"
-            style={{
-              textShadow: '1px 0 0 rgba(255,255,255,1), -1px 0 0 rgba(255,255,255,1), 0 1px 0 rgba(255,255,255,1), 0 -1px 0 rgba(255,255,255,1), 1px 1px 0 rgba(255,255,255,1), -1px -1px 0 rgba(255,255,255,1), 1px -1px 0 rgba(255,255,255,1), -1px 1px 0 rgba(255,255,255,1)'
-            }}
-          >
+          <span className="text-[10px] font-bold text-gray-800">
             {current} / {target}{unit}
           </span>
         </div>
