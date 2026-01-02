@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 export interface GridProps {
-  children: ReactNode;
+  children?: ReactNode;
   size?: 3 | 9;
   className?: string;
   gap?: 'none' | 'sm' | 'md' | 'lg';
