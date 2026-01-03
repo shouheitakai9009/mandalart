@@ -23,7 +23,7 @@ export interface TaskEditModalProps {
  */
 export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => {
   const dispatch = useDispatch();
-  const { error, isLoading } = useMandalartSelector();
+  const { error, isLoadingTask } = useMandalartSelector();
   const [localError, setLocalError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -144,15 +144,15 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
                   variant="danger"
                   size="sm"
                   onClick={handleDelete}
-                  disabled={isLoading}
+                  disabled={isLoadingTask}
                 >
-                  削除する
+                  {isLoadingTask ? '削除中...' : '削除する'}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowDeleteConfirm(false)}
-                  disabled={isLoading}
+                  disabled={isLoadingTask}
                 >
                   キャンセル
                 </Button>
@@ -168,7 +168,7 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例: ジムに行く"
-            disabled={isLoading}
+            disabled={isLoadingTask}
           />
         </div>
 
@@ -181,7 +181,7 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
             <IconButton
               icon={<Minus size={18} />}
               onClick={handleDecrement}
-              disabled={isLoading || currentCount === 0}
+              disabled={isLoadingTask || currentCount === 0}
               variant="default"
             />
             <Input
@@ -195,13 +195,13 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
                   setCurrentCount(newCount);
                 }
               }}
-              disabled={isLoading}
+              disabled={isLoadingTask}
               className="text-center flex-1"
             />
             <IconButton
               icon={<Plus size={18} />}
               onClick={handleIncrement}
-              disabled={isLoading || currentCount >= targetCount}
+              disabled={isLoadingTask || currentCount >= targetCount}
               variant="primary"
             />
           </div>
@@ -217,7 +217,7 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
               <IconButton
                 icon={<Minus size={18} />}
                 onClick={handleTargetDecrement}
-                disabled={isLoading || targetCount === 1}
+                disabled={isLoadingTask || targetCount === 1}
                 variant="default"
               />
               <Input
@@ -230,13 +230,13 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
                     setTargetCount(newTarget);
                   }
                 }}
-                disabled={isLoading}
+                disabled={isLoadingTask}
                 className="text-center flex-1"
               />
               <IconButton
                 icon={<Plus size={18} />}
                 onClick={handleTargetIncrement}
-                disabled={isLoading}
+                disabled={isLoadingTask}
                 variant="primary"
               />
             </div>
@@ -247,7 +247,7 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
               value={targetUnit}
               onChange={(e) => setTargetUnit(e.target.value)}
               placeholder="回/週"
-              disabled={isLoading}
+              disabled={isLoadingTask}
             />
           </div>
         </div>
@@ -279,7 +279,7 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
           <Button
             variant="danger"
             onClick={() => setShowDeleteConfirm(true)}
-            disabled={isLoading || showDeleteConfirm}
+            disabled={isLoadingTask || showDeleteConfirm}
             icon={<Trash2 size={16} />}
           >
             削除
@@ -288,16 +288,16 @@ export const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => 
             <Button
               variant="outline"
               onClick={onClose}
-              disabled={isLoading}
+              disabled={isLoadingTask}
             >
               キャンセル
             </Button>
             <Button
               variant="primary"
               onClick={handleSave}
-              disabled={isLoading || showDeleteConfirm}
+              disabled={isLoadingTask || showDeleteConfirm}
             >
-              {isLoading ? '保存中...' : '保存'}
+              {isLoadingTask ? '保存中...' : '保存'}
             </Button>
           </div>
         </div>

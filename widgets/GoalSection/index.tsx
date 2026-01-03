@@ -1,14 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { Grid } from '@/designs/Grid';
 import { Cell } from '@/designs/Cell';
 import { TaskCell } from '@/widgets/TaskCell';
+import { IconButton } from '@/designs/IconButton';
 import { Goal, Task } from '@/states';
+import { Trash2 } from 'lucide-react';
 
 export interface GoalSectionProps {
   goal: Goal;
   onTaskClick?: (task: Task) => void;
   onGoalSelect?: () => void;
+  onGoalDelete?: (goal: Goal) => void;
   selectedTaskId?: string | null;
   goalColor?: string;
 }
@@ -21,11 +25,21 @@ export const GoalSection = ({
   goal,
   onTaskClick,
   onGoalSelect,
+  onGoalDelete,
   selectedTaskId,
   goalColor,
 }: GoalSectionProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   // タスクを位置順にソート
   const sortedTasks = [...goal.tasks].sort((a, b) => a.position - b.position);
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onGoalDelete) {
+      onGoalDelete(goal);
+    }
+  };
 
   return (
     <Grid size={3} gap="none" className="w-full h-full">
@@ -40,9 +54,25 @@ export const GoalSection = ({
               variant="goal"
               onClick={onGoalSelect}
               bgColor={goalColor}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
-              <div className="text-center text-sm font-bold leading-tight px-1">
-                {goal.title}
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="text-center text-sm font-bold leading-tight px-1">
+                  {goal.title}
+                </div>
+                {/* 削除ボタン（ホバー時に表示） */}
+                {isHovered && onGoalDelete && (
+                  <div className="absolute top-1 right-1">
+                    <IconButton
+                      icon={<Trash2 size={14} />}
+                      variant="danger"
+                      onClick={handleDeleteClick}
+                      className="opacity-90 hover:opacity-100"
+                      aria-label="目標を削除"
+                    />
+                  </div>
+                )}
               </div>
             </Cell>
           );

@@ -3,13 +3,14 @@
 import { Grid } from '@/designs/Grid';
 import { GoalSection } from '@/widgets/GoalSection';
 import { CenterSection } from '@/widgets/CenterSection';
-import { Mandalart, Task } from '@/states';
+import { Mandalart, Task, Goal } from '@/states';
 import { GOAL_COLORS } from '@/libs/constants';
 
 export interface MandalartGridProps {
   mandalart: Mandalart;
   onTaskClick?: (task: Task) => void;
   onMainGoalClick?: () => void;
+  onGoalDelete?: (goal: Goal) => void;
   selectedCellId?: string | null;
 }
 
@@ -23,6 +24,7 @@ export const MandalartGrid = ({
   mandalart,
   onTaskClick,
   onMainGoalClick,
+  onGoalDelete,
   selectedCellId,
 }: MandalartGridProps) => {
   // 目標を位置順にソート
@@ -69,6 +71,7 @@ export const MandalartGrid = ({
             <GoalSection
               goal={goal}
               onTaskClick={onTaskClick}
+              onGoalDelete={onGoalDelete}
               selectedTaskId={selectedCellId}
               goalColor={goalColor}
             />

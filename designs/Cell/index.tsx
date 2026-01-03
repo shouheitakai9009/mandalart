@@ -7,6 +7,8 @@ export interface CellProps {
   isSelected?: boolean;
   isEditing?: boolean;
   onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   className?: string;
   bgColor?: string;
 }
@@ -21,6 +23,8 @@ export const Cell = ({
   isSelected = false,
   isEditing = false,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   className = '',
   bgColor,
 }: CellProps) => {
@@ -45,6 +49,8 @@ export const Cell = ({
     <motion.div
       className={`${baseClasses} ${backgroundClass} ${stateClasses} ${className}`}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.15, ease: 'easeOut' }}

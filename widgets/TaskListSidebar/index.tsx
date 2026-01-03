@@ -13,8 +13,21 @@ export interface TaskListSidebarProps {
  * 選択中のマンダラートのタスク一覧を目標ごとにグルーピングして表示
  */
 export const TaskListSidebar = ({ onTaskClick }: TaskListSidebarProps) => {
-  const { currentMandalart } = useMandalartSelector();
+  const { currentMandalart, isLoadingMandalarts } = useMandalartSelector();
 
+  // ローディング中
+  if (isLoadingMandalarts) {
+    return (
+      <aside className="w-80 h-screen bg-white border-r border-gray-200 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+          <p className="text-sm text-gray-500">タスクを読み込み中...</p>
+        </div>
+      </aside>
+    );
+  }
+
+  // マンダラート未選択
   if (!currentMandalart) {
     return (
       <aside className="w-80 h-screen bg-white border-r border-gray-200 flex items-center justify-center">

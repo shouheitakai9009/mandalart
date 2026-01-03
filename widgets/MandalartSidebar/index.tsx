@@ -9,7 +9,7 @@ import { useMandalartSelector, useMandalartActions } from '@/states';
  * アクティブなマンダラート一覧とアーカイブセクションを表示
  */
 export const MandalartSidebar = () => {
-  const { mandalarts, currentMandalart } = useMandalartSelector();
+  const { mandalarts, currentMandalart, isLoadingMandalarts } = useMandalartSelector();
   const { setCurrentMandalart } = useMandalartActions();
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
@@ -38,7 +38,11 @@ export const MandalartSidebar = () => {
             アクティブ
           </h3>
           <div className="space-y-2">
-            {activeMandalarts.length === 0 ? (
+            {isLoadingMandalarts ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : activeMandalarts.length === 0 ? (
               <p className="text-sm text-gray-500">
                 アクティブなマンダラートがありません
               </p>
